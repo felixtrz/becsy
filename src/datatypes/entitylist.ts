@@ -1,120 +1,129 @@
-import {InternalError} from '../errors';
-import type {Entity, EntityId} from '../entity';
-import type {EntityPool} from '../registry';
+import type { Entity, EntityId } from '../entity';
+
+import type { EntityPool } from '../registry';
+import { InternalError } from '../errors';
 
 export type OrderTransform = (entity: Entity) => number;
 
 export interface EntityList {
-  entities: Entity[];
-  add(id: EntityId): void;
-  clear(): void;
-  sort(): void;
+	entities: Entity[];
+	add(id: EntityId): void;
+	clear(): void;
+	sort(): void;
 }
-
 
 export class ArrayEntityList implements EntityList {
-  readonly entities: Entity[] = [];
-  private maxOrderKey = -Infinity;
-  private sorted = true;
+	readonly entities: Entity[] = [];
+	private maxOrderKey = -Infinity;
+	private sorted = true;
 
-  constructor(
-    private readonly pool: EntityPool, private readonly orderBy: OrderTransform | undefined
-  ) {}
+	constructor(
+		private readonly pool: EntityPool,
+		private readonly orderBy: OrderTransform | undefined,
+	) {}
 
-  add(id: EntityId): void {
-    const entity = this.pool.borrowTemporarily(id);
-    if (this.orderBy) {
-      const orderKey = this.orderBy(entity);
-      if (orderKey >= this.maxOrderKey) {
-        this.maxOrderKey = orderKey;
-      } else {
-        this.sorted = false;
-      }
-    }
-    this.entities.push(entity);
-  }
+	add(id: EntityId): void {
+		const entity = this.pool.borrowTemporarily(id);
+		if (this.orderBy) {
+			const orderKey = this.orderBy(entity);
+			if (orderKey >= this.maxOrderKey) {
+				this.maxOrderKey = orderKey;
+			} else {
+				this.sorted = false;
+			}
+		}
+		this.entities.push(entity);
+	}
 
-  clear(): void {
-    if (this.entities.length) this.entities.length = 0;
-    this.maxOrderKey = -Infinity;
-    this.sorted = true;
-  }
+	clear(): void {
+		if (this.entities.length) this.entities.length = 0;
+		this.maxOrderKey = -Infinity;
+		this.sorted = true;
+	}
 
-  sort(): void {
-    if (this.sorted) return;
-    const orderBy = this.orderBy!;
-    for (const entity of this.entities) entity.__sortKey = orderBy(entity);
-    this.entities.sort((a, b) => {
-      return a.__sortKey < b.__sortKey ? -1 : a.__sortKey > b.__sortKey ? +1 : 0;
-    });
-    this.sorted = true;
-  }
+	sort(): void {
+		if (this.sorted) return;
+		const orderBy = this.orderBy!;
+		for (const entity of this.entities) entity.__sortKey = orderBy(entity);
+		this.entities.sort((a, b) => {
+			return a.__sortKey < b.__sortKey
+				? -1
+				: a.__sortKey > b.__sortKey
+				? +1
+				: 0;
+		});
+		this.sorted = true;
+	}
 }
 
-
 export class PackedArrayEntityList implements EntityList {
-  entities: Entity[] = [];
-  private readonly lookupTable: Int32Array;
-  private maxOrderKey = -Infinity;
-  private sorted = true;
+	entities: Entity[] = [];
+	private readonly lookupTable: Int32Array;
+	private maxOrderKey = -Infinity;
+	private sorted = true;
 
-  constructor(
-    private readonly pool: EntityPool, private readonly orderBy: OrderTransform | undefined,
-    maxEntities: number
-  ) {
-    this.lookupTable = new Int32Array(maxEntities);
-    this.lookupTable.fill(-1);
-  }
+	constructor(
+		private readonly pool: EntityPool,
+		private readonly orderBy: OrderTransform | undefined,
+		maxEntities: number,
+	) {
+		this.lookupTable = new Int32Array(maxEntities);
+		this.lookupTable.fill(-1);
+	}
 
-  add(id: EntityId): void {
-    const entity = this.pool.borrow(id);
-    if (this.orderBy) {
-      const orderKey = this.orderBy(entity);
-      if (orderKey >= this.maxOrderKey) {
-        this.maxOrderKey = orderKey;
-      } else {
-        this.sorted = false;
-      }
-    }
-    const index = this.entities.push(entity) - 1;
-    this.lookupTable[id] = index;
-  }
+	add(id: EntityId): void {
+		const entity = this.pool.borrow(id);
+		if (this.orderBy) {
+			const orderKey = this.orderBy(entity);
+			if (orderKey >= this.maxOrderKey) {
+				this.maxOrderKey = orderKey;
+			} else {
+				this.sorted = false;
+			}
+		}
+		const index = this.entities.push(entity) - 1;
+		this.lookupTable[id] = index;
+	}
 
-  remove(id: EntityId): void {
-    const index = this.lookupTable[id];
-    DEBUG: if (index < 0) throw new InternalError('Entity not in list');
-    this.pool.return(id);
-    this.lookupTable[id] = -1;
-    const entity = this.entities.pop()!;
-    if (index < this.entities.length) {
-      this.entities[index] = entity;
-      this.lookupTable[entity.__id] = index;
-      if (this.orderBy) this.sorted = false;
-    }
-  }
+	remove(id: EntityId): void {
+		const index = this.lookupTable[id];
+		DEBUG: if (index < 0) throw new InternalError('Entity not in list');
+		this.pool.return(id);
+		this.lookupTable[id] = -1;
+		const entity = this.entities.pop()!;
+		if (index < this.entities.length) {
+			this.entities[index] = entity;
+			this.lookupTable[entity.__id] = index;
+			if (this.orderBy) this.sorted = false;
+		}
+	}
 
-  has(id: EntityId): boolean {
-    return this.lookupTable[id] >= 0;
-  }
+	has(id: EntityId): boolean {
+		return this.lookupTable[id] >= 0;
+	}
 
-  clear(): void {
-    for (const entity of this.entities) this.pool.return(entity.__id);
-    this.entities = [];
-    this.lookupTable.fill(-1);
-    this.maxOrderKey = -Infinity;
-    this.sorted = true;
-  }
+	clear(): void {
+		for (const entity of this.entities) this.pool.return(entity.__id);
+		this.entities = [];
+		this.lookupTable.fill(-1);
+		this.maxOrderKey = -Infinity;
+		this.sorted = true;
+	}
 
-  sort(): void {
-    if (this.sorted) return;
-    const orderBy = this.orderBy!;
-    for (const entity of this.entities) entity.__sortKey = orderBy(entity);
-    this.entities.sort((a, b) => {
-      return a.__sortKey < b.__sortKey ? -1 : a.__sortKey > b.__sortKey ? +1 : 0;
-    });
-    for (let i = 0; i < this.entities.length; i++) {
-      this.lookupTable[this.entities[i].__id] = i;
-    }
-    this.sorted = true;
-  }
+	sort(): void {
+		if (this.sorted) return;
+		const orderBy = this.orderBy!;
+		for (const entity of this.entities) entity.__sortKey = orderBy(entity);
+		this.entities.sort((a, b) => {
+			return a.__sortKey < b.__sortKey
+				? -1
+				: a.__sortKey > b.__sortKey
+				? +1
+				: 0;
+		});
+		for (let i = 0; i < this.entities.length; i++) {
+			this.lookupTable[this.entities[i].__id] = i;
+		}
+		this.sorted = true;
+	}
 }

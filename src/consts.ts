@@ -1,4 +1,3 @@
-
 export const ENTITY_ID_BITS = 22;
 export const COMPONENT_ID_BITS = 9;
 export const FIELD_SEQ_BITS = 7;
