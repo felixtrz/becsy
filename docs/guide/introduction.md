@@ -2,16 +2,16 @@
 sidebarDepth: 3
 ---
 
-# What is Becsy?
+# What is Fecsy?
 
-Becsy is an Entity Component System (ECS) framework for TypeScript and JavaScript that makes it nearly effortless to write performant code. It's inspired by [ECSY](https://github.com/ecsyjs/ecsy) and [bitecs](https://github.com/NateTheGreatt/bitECS), and guided by [ideas from Flecs](https://ajmmertens.medium.com/why-vanilla-ecs-is-not-enough-d7ed4e3bebe5).
+Fecsy is an Entity Component System (ECS) framework for TypeScript and JavaScript that makes it nearly effortless to write performant code. It's inspired by [ECSY](https://github.com/ecsyjs/ecsy) and [bitecs](https://github.com/NateTheGreatt/bitECS), and guided by [ideas from Flecs](https://ajmmertens.medium.com/why-vanilla-ecs-is-not-enough-d7ed4e3bebe5).
 
 ## Priorities
 
-Becsy positions itself within the wider ecosystem of ECS frameworks with the following set of priorities:
+Fecsy positions itself within the wider ecosystem of ECS frameworks with the following set of priorities:
 
 1. Ergonomic: the API is powerful, expressive, and safe, rather than minimal or low-level. I believe that developers choose TypeScript / JavaScript because it's a high level language, where they can express ideas quickly and succinctly. If they need to prioritize performance they'll pick a language and ECS implementation better suited to that objective.
-2. Performant: the point above notwithstanding, Becsy does its best not to unnecessarily leave potential performance on the table. I believe that a good ECS should be usable for more than just toy apps.
+2. Performant: the point above notwithstanding, Fecsy does its best not to unnecessarily leave potential performance on the table. I believe that a good ECS should be usable for more than just toy apps.
 
 ## Features
 
@@ -47,7 +47,7 @@ I'm actively supporting this package but it's not my primary job, so responses m
 
 ## Showcase
 
-Here are some public creations that use Becsy:
+Here are some public creations that use Fecsy:
 
 - [Special Releases 2022](https://www.special-releases.com/)
 - [Moyosa Spaces](https://moyosaspaces.com/)
@@ -55,4 +55,4 @@ Here are some public creations that use Becsy:
 
 ## Acknowledgements
 
-Many thanks to Becsy's early users, who helped shape the feature set and API, and found tons of bugs! Thanks to [ECSY](https://github.com/ecsyjs/ecsy) for the inspiration and their fine documentation, which served as the starting point for this site. And thanks to [Kate Liu](https://www.instagram.com/lemonikate/) for the logo design!
+Many thanks to Fecsy's early users, who helped shape the feature set and API, and found tons of bugs! Thanks to [ECSY](https://github.com/ecsyjs/ecsy) for the inspiration and their fine documentation, which served as the starting point for this site. And thanks to [Kate Liu](https://www.instagram.com/lemonikate/) for the logo design!

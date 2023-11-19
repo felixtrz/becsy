@@ -116,7 +116,7 @@ What order will your systems be executed in? In principle, it doesn't matter, si
 
 In practice, though, this would lead to unacceptable latency in propagating changes through your systems, so we want to order their execution such that all changes are fully processed in a single frame whenever possible. In other ECS libraries this is typically done by registering the systems in the desired order of execution or by setting system priorities. We take a different approach.
 
-Becsy lets you declare a partial order on your systems through powerful precedence directives, leading to an acyclic graph of systems that can be automatically linearized for single-threaded execution. This is more complex than explicitly specifying the exact order but it allows for efficient mapping onto multi-threaded execution, and also lets you integrate third party system packages without needing to understand their internal ordering constraints.
+Fecsy lets you declare a partial order on your systems through powerful precedence directives, leading to an acyclic graph of systems that can be automatically linearized for single-threaded execution. This is more complex than explicitly specifying the exact order but it allows for efficient mapping onto multi-threaded execution, and also lets you integrate third party system packages without needing to understand their internal ordering constraints.
 
 Each system can specify its ordering constraints via a schedule builder:
 
@@ -318,7 +318,7 @@ Attached systems will be forced into the same thread, limiting the potential for
 
 ## Singleton components
 
-While most component types are intended to be instantiated as components on multiple entities, some should have only one instance &mdash; for example, global settings or global state for a game. To support this you could create an entity to hold the sole component instance and query for it in all the systems that need to reference it, but Becsy provides a shortcut. In every system that needs to access the singleton just declare access to it like this:
+While most component types are intended to be instantiated as components on multiple entities, some should have only one instance &mdash; for example, global settings or global state for a game. To support this you could create an entity to hold the sole component instance and query for it in all the systems that need to reference it, but Fecsy provides a shortcut. In every system that needs to access the singleton just declare access to it like this:
 
 ```ts{6}
 @component class Global {
@@ -355,7 +355,7 @@ class SystemA extends System {
 Properties holding singletons must not be ES2022 private fields (the ones prefixed with `#`), but if you're using TypeScript it's fine if they're declared as `private`.
 :::
 
-You can declare a singleton with either `read` or `write` access and Becsy will automatically create an entity to hold it, add the component, set its storage strategy to `compact` with a capacity of 1, and return a handle that you can use throughout the system's lifecycle. Naturally, once you declare a component type as a singleton you can no longer add it to your own entities.
+You can declare a singleton with either `read` or `write` access and Fecsy will automatically create an entity to hold it, add the component, set its storage strategy to `compact` with a capacity of 1, and return a handle that you can use throughout the system's lifecycle. Naturally, once you declare a component type as a singleton you can no longer add it to your own entities.
 
 One thing to watch out for is that any singletons declared with `write` access will track a change event every time the system executes, whether the system made any changes to the component's value or not. If you have a `changed` query tracking a singleton component and the system doesn't actually update it every frame, you should instead move the `this.singleton.write` call into your `execute` method. This will give you a writable handle and track changes only when you need it, though you'll need to explicitly claim a write entitlement to the component type and you'll still need to declare the singleton in the usual way in another system (with `this.singleton.read` in the constructor) to get it set up correctly.
 

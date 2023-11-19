@@ -15,12 +15,12 @@ const world = World.create();
 You can then execute all the world's systems at any time by calling:
 
 ```js
-world.execute(); // use Becsy's built-in clock
+world.execute(); // use Fecsy's built-in clock
 world.execute(time, delta); // or control the clock yourself
 ```
 
 ```ts
-world.execute(); // use Becsy's built-in clock
+world.execute(); // use Fecsy's built-in clock
 world.execute(time, delta); // or control the clock yourself
 ```
 
@@ -86,7 +86,7 @@ Outside of tests, if you need multiple consecutive worlds then calling `world.te
 
 ## Partial execution
 
-There are some more advanced use cases where you don't want every system to execute once in every frame. For example, you may have different systems running in different scenes in your game, or you want to run your physics systems at a fixed time interval but sync the render systems to the screen's refresh. Becsy caters for these scenarios in two ways.
+There are some more advanced use cases where you don't want every system to execute once in every frame. For example, you may have different systems running in different scenes in your game, or you want to run your physics systems at a fixed time interval but sync the render systems to the screen's refresh. Fecsy caters for these scenarios in two ways.
 
 ### Start / stop
 
