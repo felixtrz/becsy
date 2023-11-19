@@ -292,7 +292,7 @@ export abstract class System {
 	 * create entities or access components.  Instead, it should set any needed data on the system's
 	 * properties to be used in `initialize`, which will be called afterwards.
 	 */
-	async prepare(): Promise<void> {} // eslint-disable-line @typescript-eslint/no-empty-function
+	prepare(): void {} // eslint-disable-line @typescript-eslint/no-empty-function
 
 	/**
 	 * Initializes the system; to be implemented in a subclass and invoked automatically precisely
@@ -498,7 +498,7 @@ export class SystemBox {
 		}
 	}
 
-	prepare(): Promise<void> {
+	prepare(): void {
 		return this.system.prepare();
 	}
 

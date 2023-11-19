@@ -362,7 +362,7 @@ export class FrameImpl {
 	 *
 	 * You cannot call `begin` while any other executors are running.
 	 */
-	async begin(): Promise<void> {
+	begin() {
 		CHECK: if (this.executing) throw new CheckError('Frame already executing');
 		this.executing = true;
 		const lastTime = this.dispatcher.lastTime ?? this.time;
@@ -375,7 +375,7 @@ export class FrameImpl {
 	 * Indicates that execution of a frame has completed.  Must be called once at the end of each
 	 * frame, after any calls to `execute`.
 	 */
-	async end(): Promise<void> {
+	end() {
 		CHECK: if (!this.executing) throw new CheckError('Frame not executing');
 		this.executing = false;
 		allExecuted: {
@@ -383,7 +383,7 @@ export class FrameImpl {
 			for (const group of this.groups) group.__executed = false;
 			this.dispatcher.completeCycle();
 		}
-		await this.dispatcher.completeFrame();
+		this.dispatcher.completeFrame();
 	}
 
 	/**
@@ -403,7 +403,7 @@ export class FrameImpl {
 	 * `delta` property and default to the duration since any previous frame's `begin` was called.
 	 * It's not used internally so you can pass in any numeric value that's expected by your systems.
 	 */
-	execute(group: SystemGroup, time?: number, delta?: number): Promise<void> {
+	execute(group: SystemGroup, time?: number, delta?: number): void {
 		CHECK: if (!this.groups.includes(group)) {
 			throw new CheckError('Group not included in this frame');
 		}

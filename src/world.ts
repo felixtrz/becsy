@@ -32,9 +32,9 @@ export class World {
 	 *
 	 * @returns A promise of a new world to do with as you please.
 	 */
-	static async create(options: WorldOptions = {}): Promise<World> {
+	static create(options: WorldOptions = {}) {
 		const world = new World(options, MAGIC_COOKIE);
-		await world.__dispatcher.initialize();
+		world.__dispatcher.initialize();
 		return world;
 	}
 
@@ -149,7 +149,7 @@ export class World {
 	 * `delta` property and default to the duration since the previous call to `execute`. It's not
 	 * used internally so you can pass in any numeric value that's expected by your systems.
 	 */
-	execute(time?: number, delta?: number): Promise<void> {
+	execute(time?: number, delta?: number) {
 		return this.__dispatcher.execute(time, delta);
 	}
 
@@ -196,8 +196,8 @@ export class World {
 	 * Terminates this world once the current frame (if any) completes.  All workers will be
 	 * terminated and no further executions will be allowed.
 	 */
-	async terminate(): Promise<void> {
-		await this.__dispatcher.terminate();
+	terminate() {
+		this.__dispatcher.terminate();
 	}
 
 	get stats(): Stats {

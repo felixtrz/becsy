@@ -406,27 +406,27 @@ export class Dispatcher {
 		return [system];
 	}
 
-	async initialize(): Promise<void> {
-		await this.default.frame.begin();
+	initialize() {
+		this.default.frame.begin();
 		this.state = State.setup;
-		await this.default.group.__plan.initialize();
-		await this.default.frame.end();
+		this.default.group.__plan.initialize();
+		this.default.frame.end();
 		STATS: this.stats.frames -= 1;
 	}
 
-	private async finalize(): Promise<void> {
-		await this.default.frame.begin();
+	private finalize() {
+		this.default.frame.begin();
 		this.state = State.done;
-		await this.default.group.__plan.finalize();
-		await this.default.frame.end();
+		this.default.group.__plan.finalize();
+		this.default.frame.end();
 		STATS: this.stats.frames -= 1;
 		this.registry.releaseComponentTypes();
 	}
 
-	async execute(time?: number, delta?: number): Promise<void> {
-		await this.default.frame.begin();
-		await this.default.frame.execute(this.default.group, time, delta);
-		await this.default.frame.end();
+	execute(time?: number, delta?: number) {
+		this.default.frame.begin();
+		this.default.frame.execute(this.default.group, time, delta);
+		this.default.frame.end();
 	}
 
 	executeFunction(fn: (system: System) => void): void {
@@ -466,7 +466,7 @@ export class Dispatcher {
 		this.lastTime = time;
 	}
 
-	completeFrame(): Promise<void> {
+	completeFrame() {
 		DEBUG: if (!this.executing) throw new InternalError('No frame executing');
 		this.executing = false;
 		STATS: this.gatherFrameStats();
@@ -491,7 +491,7 @@ export class Dispatcher {
 		this.writeLog?.commit();
 	}
 
-	async terminate(): Promise<void> {
+	terminate() {
 		CHECK: {
 			if (this.state !== State.setup && this.state !== State.run) {
 				throw new CheckError('World terminated');
@@ -503,7 +503,7 @@ export class Dispatcher {
 			}
 		}
 		this.state = State.finish;
-		if (!this.executing) await this.finalize();
+		if (!this.executing) this.finalize();
 	}
 
 	createEntity(

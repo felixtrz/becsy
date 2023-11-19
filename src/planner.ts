@@ -15,9 +15,9 @@ export abstract class Plan {
 		this.graph = planner.graph.induceSubgraph(group.__systems);
 	}
 
-	abstract execute(time: number, delta: number): Promise<void>;
-	abstract initialize(): Promise<void>;
-	abstract finalize(): Promise<void>;
+	abstract execute(time: number, delta: number): void;
+	abstract initialize(): void;
+	abstract finalize(): void;
 }
 
 class SimplePlan extends Plan {
@@ -38,7 +38,7 @@ class SimplePlan extends Plan {
 		}
 	}
 
-	execute(time: number, delta: number): Promise<void> {
+	execute(time: number, delta: number) {
 		const dispatcher = this.planner.dispatcher;
 		const systems = this.systems;
 		this.group.__executed = true;
@@ -47,56 +47,39 @@ class SimplePlan extends Plan {
 			system.execute(time, delta);
 			dispatcher.flush();
 		}
-		return Promise.resolve();
 	}
 
-	async initialize(): Promise<void> {
+	initialize() {
 		const dispatcher = this.planner.dispatcher;
 		this.group.__executed = true;
-		return new Promise((resolve, reject) => {
-			let rejected = false;
-
-			const initSystem = async (system: SystemBox) => {
-				try {
-					await system.prepare();
-					if (rejected) return;
-					system.initialize();
-					dispatcher.flush();
-					const systems = this.graph.traverse(system);
-					if (!systems) return resolve();
-					for (let i = 0; i < systems.length; i++) initSystem(systems[i]);
-				} catch (e) {
-					rejected = true;
-					reject(e);
-				}
-			};
-
-			const systems = this.graph.traverse();
-			if (!systems) return resolve();
+		const initSystem = (system: SystemBox) => {
+			system.prepare();
+			system.initialize();
+			dispatcher.flush();
+			const systems = this.graph.traverse(system);
+			if (!systems) return;
 			for (let i = 0; i < systems.length; i++) initSystem(systems[i]);
-		});
+		};
+
+		const systems = this.graph.traverse();
+		if (!systems) return;
+		for (let i = 0; i < systems.length; i++) initSystem(systems[i]);
 	}
 
-	async finalize(): Promise<void> {
+	finalize() {
 		const dispatcher = this.planner.dispatcher;
 		this.group.__executed = true;
-		return new Promise((resolve, reject) => {
-			const finalizeSystem = (system: SystemBox) => {
-				try {
-					system.finalize();
-					dispatcher.flush();
-					const systems = this.graph.traverse(system);
-					if (!systems) return resolve();
-					for (let i = 0; i < systems.length; i++) finalizeSystem(systems[i]);
-				} catch (e) {
-					reject(e);
-				}
-			};
-
-			const systems = this.graph.traverse();
-			if (!systems) return resolve();
+		const finalizeSystem = (system: SystemBox) => {
+			system.finalize();
+			dispatcher.flush();
+			const systems = this.graph.traverse(system);
+			if (!systems) return;
 			for (let i = 0; i < systems.length; i++) finalizeSystem(systems[i]);
-		});
+		};
+
+		const systems = this.graph.traverse();
+		if (!systems) return;
+		for (let i = 0; i < systems.length; i++) finalizeSystem(systems[i]);
 	}
 }
 
