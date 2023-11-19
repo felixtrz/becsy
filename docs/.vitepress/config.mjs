@@ -2,9 +2,9 @@ import container from 'markdown-it-container';
 import { defineConfig } from 'vitepress';
 
 export default defineConfig({
-	base: '/becsy/',
+	base: '/fecsy/',
 	lang: 'en-US',
-	title: 'Becsy',
+	title: 'Fecsy',
 	description:
 		'Multi-threaded Entity Component System framework for TS and JS.',
 	lastUpdated: true,
@@ -17,7 +17,7 @@ export default defineConfig({
 
 	themeConfig: {
 		logo: '/logo_small.png',
-		repo: 'lastolivegames/becsy',
+		repo: 'felixtrz/fecsy',
 		docsDir: 'docs',
 		docsBranch: 'main',
 		editLinks: true,
@@ -34,13 +34,13 @@ export default defineConfig({
 					{ text: 'Discord', link: 'https://discord.gg/X72ct6hZSr' },
 					{
 						text: 'Issues',
-						link: 'https://github.com/lastolivegames/becsy/issues',
+						link: 'https://github.com/felixtrz/fecsy/issues',
 					},
 				],
 			},
 			{
 				text: 'Release Notes',
-				link: 'https://github.com/LastOliveGames/becsy/blob/main/CHANGELOG.md',
+				link: 'https://github.com/felixtrz/fecsy/blob/main/CHANGELOG.md',
 			},
 		],
 
