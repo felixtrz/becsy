@@ -76,7 +76,6 @@ function getGuideSidebar() {
 				{ text: 'Entities', link: '/guide/architecture/entities' },
 				{ text: 'Systems', link: '/guide/architecture/systems' },
 				{ text: 'Queries', link: '/guide/architecture/queries' },
-				{ text: 'Multi-threading', link: '/guide/architecture/threading' },
 			],
 		},
 		{
