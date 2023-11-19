@@ -62,7 +62,7 @@ function getGuideSidebar() {
 		{
 			text: 'Introduction',
 			children: [
-				{ text: 'What is Becsy?', link: '/guide/introduction' },
+				{ text: 'What is Fecsy?', link: '/guide/introduction' },
 				{ text: 'Getting Started', link: '/guide/getting-started' },
 				{ text: 'Deploying', link: '/guide/deploying' },
 			],
