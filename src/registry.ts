@@ -10,20 +10,12 @@ import {
 } from './component';
 import { ComponentEnum } from './enums';
 import { Log, type LogPointer } from './datatypes/log';
-import {
-	SharedAtomicPool,
-	type Uint32Pool,
-	UnsharedPool,
-} from './datatypes/intpool';
+import { type Uint32Pool, UnsharedPool } from './datatypes/intpool';
 import type { Dispatcher } from './dispatcher';
 import { type Entity, type EntityId, EntityImpl } from './entity';
 import { COMPONENT_ID_MASK, ENTITY_ID_BITS, ENTITY_ID_MASK } from './consts';
 import type { SystemBox } from './system';
-import {
-	AtomicSharedShapeArray,
-	type ShapeArray,
-	UnsharedShapeArray,
-} from './datatypes/shapearray';
+import { type ShapeArray, UnsharedShapeArray } from './datatypes/shapearray';
 import { CheckError, InternalError } from './errors';
 import type { TrackingMask } from './query';
 
@@ -128,9 +120,7 @@ export class Registry {
 	) {
 		this.allocationItems = this.prepareComponentTypesAndEnums();
 		for (const item of this.allocationItems) this.numShapeBits += item.size;
-		const ShapeArrayClass = dispatcher.threaded
-			? AtomicSharedShapeArray
-			: UnsharedShapeArray;
+		const ShapeArrayClass = UnsharedShapeArray;
 		this.shapes = new ShapeArrayClass(
 			'registry.shapes',
 			this.numShapeBits,
@@ -149,9 +139,7 @@ export class Registry {
 			maxEntities,
 			dispatcher.buffers,
 		);
-		this.entityIdPool = dispatcher.threaded
-			? new SharedAtomicPool(maxEntities, 'maxEntities', dispatcher.buffers)
-			: new UnsharedPool(maxEntities, 'maxEntities');
+		this.entityIdPool = new UnsharedPool(maxEntities, 'maxEntities');
 		this.entityOrdinals = dispatcher.buffers.register(
 			'registry.entityOrdinals',
 			maxEntities,

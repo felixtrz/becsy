@@ -132,7 +132,6 @@ export class Dispatcher {
 	readonly stats;
 	readonly indexer: RefIndexer;
 	readonly planner: Planner;
-	readonly threads: number;
 	readonly buffers: Buffers;
 	readonly singleton?: Entity;
 	private buildSystem: Build;
@@ -140,7 +139,6 @@ export class Dispatcher {
 
 	constructor({
 		defs,
-		threads = 1,
 		maxEntities = 10000,
 		maxLimboComponents = Math.ceil(maxEntities / 5),
 		maxShapeChangesPerFrame = maxEntities * 2,
@@ -148,8 +146,6 @@ export class Dispatcher {
 		maxRefChangesPerFrame = maxEntities,
 		defaultComponentStorage = 'packed',
 	}: WorldOptions) {
-		if (threads < 1) throw new CheckError('Minimum of one thread');
-		if (threads > 1) throw new CheckError('Multithreading not yet implemented');
 		if (maxEntities > MAX_NUM_ENTITIES) {
 			throw new CheckError(
 				`maxEntities too high, the limit is ${MAX_NUM_ENTITIES}`,
@@ -167,8 +163,7 @@ export class Dispatcher {
 			);
 		}
 		STATS: this.stats = new Stats();
-		this.threads = threads;
-		this.buffers = new Buffers(threads > 1);
+		this.buffers = new Buffers();
 		this.maxEntities = maxEntities;
 		this.defaultComponentStorage = defaultComponentStorage;
 		this.registry = new Registry(
@@ -215,10 +210,6 @@ export class Dispatcher {
 		}
 		for (const box of this.systems) box.finishConstructing();
 		this.state = State.setup;
-	}
-
-	get threaded(): boolean {
-		return this.threads > 1;
 	}
 
 	get defaultGroup(): SystemGroup {

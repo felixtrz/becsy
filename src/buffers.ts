@@ -66,7 +66,7 @@ export class Buffers {
 	private readonly items = new Map<string, Item>();
 	private changes?: Patch;
 
-	constructor(private readonly threaded: boolean) {}
+	constructor() {}
 
 	register(
 		key: string,
@@ -162,11 +162,7 @@ export class Buffers {
 			needBiggerBuffer || item!.array.constructor !== ArrayType;
 		if (!item || needBiggerBuffer || needNewArray) {
 			const newItem = new Item();
-			newItem.buffer = needBiggerBuffer
-				? this.threaded
-					? new SharedArrayBuffer(size)
-					: new ArrayBuffer(size)
-				: item!.buffer;
+			newItem.buffer = needBiggerBuffer ? new ArrayBuffer(size) : item!.buffer;
 			newItem.array = new ArrayType(newItem.buffer);
 			if (item) {
 				newItem.array.set(item.array);
@@ -178,13 +174,6 @@ export class Buffers {
 			}
 			item = newItem;
 			this.items.set(key, item);
-			if (this.threaded) {
-				if (!this.changes) this.changes = new Map();
-				this.changes.set(key, {
-					buffer: item.buffer as SharedArrayBuffer,
-					arrayKind: arrayTypeToKind.get(ArrayType)!,
-				});
-			}
 			update?.(item.array);
 		}
 		item.update = update;
